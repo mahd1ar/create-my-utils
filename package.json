@@ -1,0 +1,18 @@
+{
+  "name": "create-my-utils",
+  "version": "1.0.2",
+  "description": "my own utils",
+  "bin": {
+    "create-my-utils": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "author": "mahdiyar anari",
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/select": "^1.1.7",
+    "node-fetch": "^3.3.1"
+  },
+  "type": "module"
+}
