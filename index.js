@@ -18,8 +18,8 @@ import { execSync, spawnSync } from 'child_process';
  *      sha: string,
  *      size: number,
  *      url: string
-* }[] >} | { sha : string, node_id: string, size: number, url: string, content: encoding: string }
-}
+ * }[]  | { sha : string, node_id: string, size: number, url: string, content: encoding: string }
+ *}>
  */
 async function fetchAPI(url = '') {
 
