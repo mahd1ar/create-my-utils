@@ -37,7 +37,7 @@ async function fetchAPI(url = '') {
  * @param {string} str 
  */
 function camelToHuman(str) {
-    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1 $2').toLowerCase()
+    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1 $2').toLowerCase().split('-').filter(Boolean).join(' ')
 }
 
 /**
@@ -65,7 +65,7 @@ async function visualizeRepo(url, path = "") {
     } else {
         const content = execSync(`curl -L https://raw.githubusercontent.com/mahd1ar/${REPO}/master/${path}`)
 
-        const mode = (x.toString().split(/\r?\n/)[0])
+        const mode = (content.toString().split(/\r?\n/)[0])
             .replace(/\/\/|#/g, "")
             .replace(/<!--|-->/g, "")
             .replace(/\s*/g, '')
