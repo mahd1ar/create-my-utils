@@ -4,7 +4,7 @@ import select, { Separator } from '@inquirer/select';
 import fetch from 'node-fetch';
 import { execSync, spawnSync } from 'child_process';
 
-
+const REPO = 'create-my-utils'
 /**
  * 
  * @returns {Promise<{
@@ -34,10 +34,18 @@ async function fetchAPI(url = '') {
 
 /**
  * 
+ * @param {string} str 
+ */
+function camelToHuman(str) {
+    return str.replace(/([a-z0-9]|(?=[A-Z]))([A-Z])/g, '$1 $2').toLowerCase()
+}
+
+/**
+ * 
  * @param {string} url 
  * @param {string} path 
  */
-async function visualizeRepo(url, path) {
+async function visualizeRepo(url, path = "") {
     const data = await fetchAPI(url)
 
     if (data.tree) {
@@ -45,7 +53,7 @@ async function visualizeRepo(url, path) {
         const answer = await select({
             message: 'Select file or path',
             choices: data.tree.map(i => ({
-                name: i.type === 'tree' ? `[] ${i.path} ->` : i.path,
+                name: i.type === 'tree' ? `[] ${camelToHuman(i.path)} ->` : camelToHuman(i.path),
                 value: { url: i.url, path: i.path },
             }))
         });
@@ -55,15 +63,45 @@ async function visualizeRepo(url, path) {
         visualizeRepo(answer.url, npath)
 
     } else {
-        const x = execSync(`curl -L https://raw.githubusercontent.com/mahd1ar/microzist/master/${path}`)
+        const content = execSync(`curl -L https://raw.githubusercontent.com/mahd1ar/${REPO}/master/${path}`)
 
-        console.log(x.toString())
+        const mode = (x.toString().split(/\r?\n/)[0])
+            .replace(/\/\/|#/g, "")
+            .replace(/<!--|-->/g, "")
+            .replace(/\s*/g, '')
+        console.log("> mode is " + mode)
+
+        switch (mode) {
+            case 'read':
+                console.log(content.toString());
+                break;
+
+            case 'write':
+                execSync(`curl -LOC - https://raw.githubusercontent.com/mahd1ar/${REPO}/master/${path}`)
+                break;
+
+            default:
+                break;
+        }
+
+
     }
 
 }
 
+async function startFrom(url, path) {
+    const data = await fetchAPI(url)
+    if (!data.content) {
+        const ndata = await fetchAPI(data.tree.find(i => i.path === path).url)
+        return ndata.url
+    }
 
-visualizeRepo('https://api.github.com/repos/mahd1ar/microzist/git/trees/master', '')
+}
+visualizeRepo(
+    await startFrom(`https://api.github.com/repos/mahd1ar/${REPO}/git/trees/master`, 'src')
+
+    , 'src')
+
 
 // const answer = await select({
 //     message: 'Select a package manager',
